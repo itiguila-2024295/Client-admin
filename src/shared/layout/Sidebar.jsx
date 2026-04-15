@@ -1,10 +1,10 @@
-import React from 'react
+import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 export const Sidebar = () => {
     const location = userLocation();
     const items = [
-        { label: "Canchas", to: "/dashboard/fields" }
+        { label: "Canchas", to: "/dashboard/fields" },
         { label: "Reservaciones", to: "/dashboard/reservations"}
     ]
   return (
@@ -14,13 +14,14 @@ export const Sidebar = () => {
                 const active = location.pathname === item.to
                 return (
                     <li key={item.to}>
-                        <Link 
-                            to={item.to}
-                            className= {'bloack px-4 py-2 rounde-lg font medium transition colors sidebar-underline'}
-                            style={active ? {fontWeight: 700}:{}}
-                        >
-                            {item.label}
-                        </Link>
+                        <Link
+                                to={item.to}
+                                className={`block px-4 py-2 rounded-lg font-medium transition-colors sidebar-underline${
+                                    active ? " active text-main-blue" : "text-gray-700 hover:bg-gray-100"}`}
+                                style={active ? { fontWeight: 700 } : {}}
+                            >
+                                {item.label}
+                            </Link>
                     </li>
                 )
             })}
