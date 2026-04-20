@@ -19,7 +19,7 @@ export const LoginForm = ({ onForgot }) => {
         const res = await login(data)
         if(res.success){
             navigate("/dashboard")
-            toast.success("¡Bienvenido de nuevo!", {duration: 4000})
+            toast.success("¡Bienvenido de nuevo!", { duration: 4000 })
         }
     }
 
