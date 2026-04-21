@@ -1,26 +1,44 @@
 import { Spinner } from "../../../shared/components/layout/Spinner.jsx";
 import defaultAvatarImg from "../../../assets/img/avatarDefault.png";
+import { useState } from "react";
 
 export const UserDetailModal = ({
     isOpen,
     onClose,
     user,
+    currentUserId,
+    onSaveRole,
     loading,
 }) => {
     if (!isOpen || !user) return null;
 
+    const [ role, setRole ] = useState(user?.role || "USER_ROLE")
+
     const avatarSrc = (() => {
         const value = user?.profilePicture?.trim();
         if (!value) return defaultAvatarImg;
-        if (value.startWith("http://") || value.startsWith("https://")) {
+
+        if (value.startsWith("http://") || value.startsWith("https://")) {
             return value;
         }
 
-        const claudinaryBase =
+        const cloudinaryBase =
             import.meta.env.VITE_CLOUDINARY_BASE_URL ||
-            "https://cloudinary.com/dqx1m6nxh/image/upload/";
-        return `${cloudinaryBase}${value.replace(/^\/+/,"")}`
-    })
+            "https://res.cloudinary.com/dqx1m6nxh/image/upload/";
+
+        return `${cloudinaryBase}${value.replace(/^\/+/, "")}`;
+    })();
+
+    const isCurrentUser = currentUserId === user.id;
+    const hasChanges = role !== user.role;
+
+    const handleSave = async () => {
+        if(!hasChanges || isCurrentUser) {
+            onClose();
+            return;
+        }
+        await onSaveRole(user, role)
+    }
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3 sm:px-4">
@@ -43,7 +61,7 @@ export const UserDetailModal = ({
                     <div className="flex items-center gap-4">
                         <img
                             src={avatarSrc}
-                            alt="{user.username}"
+                            alt={user.username}
                             className="w-16 h-16 rounded-full object-cover border"
                             onError={(e) => {
                                 e.currentTarget.onError = null;
@@ -73,7 +91,7 @@ export const UserDetailModal = ({
                         </div>
                         <div className="bg-gray-50 rounded-lg p-3">
                             <p className="text-xs text-gray-500">Apellido</p>
-                            <p className="text-sm font-medium">{user.name || "-"}</p>
+                            <p className="text-sm font-medium">{user.surname || "-"}</p>
                         </div>
                     </div>
 
@@ -82,11 +100,19 @@ export const UserDetailModal = ({
                             Rol
                         </label>
                         <select
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            disabled={isCurrentUser}
                             className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                         >
                             <option value="USER_ROLE">USER_ROLE</option>
                             <option value="ADMIN_ROLE">ADMIN_ROLE</option>
                         </select>
+                        {isCurrentUser && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                No puedes cambiar tu propio rol.
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -100,7 +126,9 @@ export const UserDetailModal = ({
                     </button>
                     <button
                         type="button"
-                        className="w-full sm:w-auto px-5 py-2 rounded-lg text-white font-medium transition shadow"
+                        onClick={handleSave}
+                        disabled={loading || !hasChanges || isCurrentUser}
+                        className="w-full sm:w-auto px-5 py-2 rounded-lg text-white font-medium transition shadow cursor-pointer"
                         style={{
                             background:
                                 "linear-gradient(90deg, var(--main-blue) 0%, #1956a3 100%)",

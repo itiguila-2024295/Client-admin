@@ -10,15 +10,16 @@ const PAGE_SIZE = 8;
 
 export const Users = () => {
 
-  const { users, loading, error, fetchUsers } = useUserManagmentStore();
+  const { users, loading, error, fetchUsers, updateUserRole } = useUserManagmentStore();
   const registerUser = useAuthStore((state) => state.register)
+  const currentUser = useAuthStore((state) => state.user)
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [openDetailModal, setOpenDetailModal] = useState(null);
-  const [selectedUser, setSelectedUsers] = useState(null);
+  const [openDetailModal, setOpenDetailModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -27,17 +28,28 @@ export const Users = () => {
   const handleCreate = async (formData) => {
     const res = await registerUser(formData)
     console.log(res)
-    if(res.success){
-      showSuccess("Usuario creado. Se envió un correo de verificación.")
-      await fetchUsers(undefined, {force: true});
+    if (res.success) {
+      showSuccess("Usuairo creado. Se envió un correo de verificación.");
+      await fetchUsers(undefined, { force: true });
       return true;
     }
-    showError(res.error || "No se puede crear el usuario");
+    showError(res.error || "No se puedo crear el usuario");
     return false;
   }
 
+  const handleSaveRole = async (user, newRole) => {
+    const res = await updateUserRole(user.id, newRole);
+    if (res.success) {
+      showSuccess("Rol actualizado correctamente")
+      setOpenDetailModal(false);
+      setSelectedUser(null);
+    } else {
+      showError(res.error || "No se pudo actualizar el rol");
+    }
+  }
+
   const handleOpenDetail = (user) => {
-    setSelectedUsers (user)
+    setSelectedUser(user)
     setOpenDetailModal(true);
   }
 
@@ -53,7 +65,7 @@ export const Users = () => {
           </p>
         </div>
 
-        <button 
+        <button
           className="bg-main-blue px-4 py-2 rounded text-white hover:opacity-90 transition"
           onClick={() => setOpenCreateModal(true)}
         >
@@ -105,29 +117,29 @@ export const Users = () => {
               ) : (
                 users.map((u) => (
                   <tr key={u.id} className="border-t hover:bg-gray-50">
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-medium text-gray-800">
                       {[u.name, u.surname].filter(Boolean).join(" ") || "-"}
                     </td>
 
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-gray-700">
                       @{u.username}
                     </td>
 
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${u.role === "ADMIN_ROLE"
-                           ?'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-700'
-                      }`}>
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-700"
+                        }`}>
                         {u.role}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                        <button 
-                          className="px-3 py-1.5 rounded-lg bg-main-blue text-white text-xs font-semibold hover:opacity-90 cursor-pointer"
-                          onClick={() => handleOpenDetail(u)}
-                        >
-                            Var / Editar
-                        </button>
+                      <button
+                        className="px-3 py-1.5 rounded-lg bg-main-blue text-white text-xs font-semibold hover:opacity-90"
+                        onClick={() => handleOpenDetail(u)}
+                      >
+                        Ver / Editar
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -157,13 +169,15 @@ export const Users = () => {
           </div>
         </div>
       </div>
+
       <CreateUserModal
-        isOpen = {openCreateModal}
-        onClose = {() => setOpenCreateModal(false)}
-        onCreate = {handleCreate}
-        loading = {loading}
-        error = {error}
+        isOpen={openCreateModal}
+        onClose={() => setOpenCreateModal(false)}
+        onCreate={handleCreate}
+        loading={loading}
+        error={error}
       />
+
       <UserDetailModal
         key={selectedUser?.id || "no-user"}
         isOpen={openDetailModal}
@@ -172,8 +186,10 @@ export const Users = () => {
           setSelectedUser(null);
         }}
         user={selectedUser}
+        onSaveRole={handleSaveRole}
+        currentUserId={currentUser?.id}
         loading={loading}
       />
-    </div>
+    </div >
   );
 }
