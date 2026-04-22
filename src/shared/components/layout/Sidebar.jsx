@@ -6,14 +6,14 @@ export const Sidebar = () => {
 
     const items = [
         { label: "Canchas", to: "/dashboard/fields" },
-        { label: "Reservaciones", to: "/dashboard/reservations" }
+        { label: "Reservaciones", to: "/dashboard/reservations" },
+        { label: "Usuarios", to: "/dashboard/users" }
     ]
     return (
         <aside className="w-60 bg-white min-h-[calc(100vh-4rem)] p-4 shadow-sm">
             <ul className="space-y-1">
                 {items.map((item) => {
                     const active = location.pathname === item.to
-
                     return (
                         <li key={item.to}>
                             <Link
