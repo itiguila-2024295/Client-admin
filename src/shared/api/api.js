@@ -15,7 +15,7 @@ const axiosAdmin = axios.create({
     headers: {
         "Content-Type": "application/json"
     }
-}) 
+})
 
 axiosAuth.interceptors.request.use((config) => {
     //config._axiosClient = "auth"
@@ -28,12 +28,12 @@ axiosAuth.interceptors.request.use((config) => {
 })
 
 axiosAdmin.interceptors.request.use((config) => {
-    //config._axiosClient = "admin"
+    //config._axiosClient = "auth"
     const token = useAuthStore.getState().token;
     if(token){
         config.headers.Authorization = `Bearer ${token}`;
     }
-
+    console.log(config)
     return config;
 })
 

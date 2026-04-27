@@ -1,6 +1,8 @@
 import { create} from "zustand";
 import { 
-    getFields as getFieldsRequest
+    getFields as getFieldsRequest,
+    createField as createFieldRequest,
+    updateField as updateFieldRequest,
 } from "../../../shared/api/admin";
 
 export const useFieldStore = create((set, get) => ({
@@ -24,5 +26,26 @@ export const useFieldStore = create((set, get) => ({
                 loading: false
             });
         }
+    },
+    createField: async (formData) =>{
+        try {
+            set ({loading: true, error: null})
+            console.log("siuuuuuuuuu")
+            const response = await createFieldRequest(formData);
+            console.log(response)
+            set({
+                fields: [response.data.data, ...get().fields],
+                loading: false
+            });
+
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Error al crear campo."
+            })
+        }
+    },
+    updateField: async (id , data) => {
+        
     }
 }))
