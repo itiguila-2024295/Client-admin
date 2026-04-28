@@ -60,6 +60,8 @@ export const FieldModal = ({ isOpen, onClose, field }) => {
     };
 
     if (!isOpen) return null;
+
+
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3 sm:px-4">
             {/* CONTENEDOR */}
@@ -230,34 +232,34 @@ export const FieldModal = ({ isOpen, onClose, field }) => {
                                 {...register("photo")}
                             />
                         </div>
-                    </div>  
+                    </div>
 
                     {/* BOTONES */}
                     <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t">
                         <button
                             type="button"
-                            className="w-full cursor-pointer sm:w-auto px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
                             onClick={() => {
                                 onClose();
                             }}
+                            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
                         >
                             Cancelar
                         </button>
 
                         <button
                             type="submit"
-                            className="w-full cursor-pointer sm:w-auto px-5 py-2 rounded-lg text-white font-medium transition shadow"
+                            className="w-full sm:w-auto cursor-pointer px-5 py-2 rounded-lg text-white font-medium transition shadow"
                             style={{
                                 background:
                                     "linear-gradient(90deg, var(--main-blue) 0%, #1956a3 100%)",
                                 border: "none",
                             }}
                         >
-                            {loading ? <Spinner/> : field ? "Guardar Cambios":"Crear Campo"}
+                            {loading ? <Spinner /> : field ? "Guardar Cambios" : "Crear Campo"}
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
